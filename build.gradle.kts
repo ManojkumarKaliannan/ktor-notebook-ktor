@@ -15,16 +15,6 @@ kotlin {
     jvmToolchain(21)
 }
 
-// Builds a single fat JAR with all dependencies — needed for Render deployment
-tasks.create("fatJar", Jar::class) {
-    manifest {
-        attributes["Main-Class"] = "io.ktor.server.netty.EngineMain"
-    }
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-    from(configurations.runtimeClasspath.get().map { if (it.isDirectory) it else zipTree(it) })
-    with(tasks.jar.get())
-    archiveFileName.set("notebook-api.jar")
-}
 
 dependencies {
     implementation(libs.ktor.server.core)
