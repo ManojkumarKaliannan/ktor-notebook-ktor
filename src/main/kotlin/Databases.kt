@@ -6,13 +6,19 @@ import org.jetbrains.exposed.sql.Database
 lateinit var noteService: NoteService
 
 fun Application.configureDatabases() {
-    val databaseUrl = System.getenv("DATABASE_URL")
+    val rawUrl = System.getenv("DATABASE_URL")
 
-    val database = if (databaseUrl != null) {
-        // Production — Railway PostgreSQL
-        log.info("Connecting to PostgreSQL: $databaseUrl")
+    val database = if (rawUrl != null) {
+        // Convert postgres:// or postgresql:// → jdbc:postgresql://
+        val jdbcUrl = when {
+            rawUrl.startsWith("jdbc:") -> rawUrl
+            rawUrl.startsWith("postgres://") -> rawUrl.replace("postgres://", "jdbc:postgresql://")
+            rawUrl.startsWith("postgresql://") -> rawUrl.replace("postgresql://", "jdbc:postgresql://")
+            else -> rawUrl
+        }
+        log.info("Connecting to PostgreSQL")
         Database.connect(
-            url = databaseUrl,
+            url = jdbcUrl,
             driver = "org.postgresql.Driver"
         )
     } else {
