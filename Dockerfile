@@ -5,7 +5,7 @@ COPY . .
 RUN gradle fatJar --no-daemon
 
 # Stage 2 — Run the JAR
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 COPY --from=build /app/build/libs/notebook-api.jar app.jar
 EXPOSE 8080
